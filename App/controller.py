@@ -20,14 +20,75 @@
  * along withthis program.  If not, see <http://www.gnu.org/licenses/>.
  """
 
+#####-----#####-----#####-----#####-----#####-----#####   ####---#####---####   #####-----#####-----#####-----#####-----#####-----#####
+#####-----#####-----#####-----#####-----#####-----#####   IMPORTACIÓN MÓDULOS   #####-----#####-----#####-----#####-----#####-----#####
+#####-----#####-----#####-----#####-----#####-----#####   ####---#####---####   #####-----#####-----#####-----#####-----#####-----#####
+
 import config as cf
 import model
 import csv
 
 
+
+
+#####-----#####-----#####-----#####-----#####   ##########-----###########-----##########   #####-----#####-----#####-----#####-----#####
+#####-----#####-----#####-----#####-----#####   FUNCIONES INICIALIZACIÓN Y CARGA DE DATOS   #####-----#####-----#####-----#####-----#####
+#####-----#####-----#####-----#####-----#####   ##########-----###########-----##########   #####-----#####-----#####-----#####-----#####
+
 """
-El controlador se encarga de mediar entre la vista y el modelo.
+    Se definen las funciones que permitirán inicializar el catálogo del museo y cargar
+    los elementos de la base de datos.
+
 """
+
+# Función que inicializa y retorna el catálogo.
+def init_catalog () -> dict:
+    """
+        Esta función invoca a la función nuevo_catalogo de model.py para crear y retornar al catálogo.
+
+        No tiene parámetros.
+
+        Retorno:
+            -> (dict): el catálogo. 
+
+    """
+
+    # Invocar función new_Catalog() de model.py, guardar su retorno en la variable catalog y retornarla.
+    catalog = model.new_catalog()
+    return catalog
+
+
+
+# Función que carga toda la información al catálogo.
+def load_data (catalog: dict) -> None:
+    """
+        Esta función carga toda la información al catálogo, y lo hace invocando a las 
+        funciones load_artists() y load_artworks.
+
+        Parámetro:
+            -> catalog (dict): catálogo.
+
+        No tiene retorno.
+
+    """
+
+    # Crear variable que guarda la referencia al archivo de los artistas.
+    file = cf.data_dir + '\\UFOS\\UFOS-utf8-small.csv'
+
+    # Crear variable que guarda todos los artistas.
+    input_file = csv.DictReader(open(file, encoding='utf-8'))
+
+
+    # Iterar sobre cada artista del catálogo.
+    for sighting in input_file:
+        city = sighting["city"]
+        model.add_city(catalog, city)
+
+
+
+
+
+
 
 # Inicialización del Catálogo de libros
 

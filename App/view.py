@@ -25,7 +25,9 @@
 #####-----#####-----#####-----#####-----#####-----#####   ####---#####---####   #####-----#####-----#####-----#####-----#####-----#####
 
 import os
+import time
 import config as cf
+from DISClib.ADT import map as mp
 import sys
 import controller
 from DISClib.ADT import list as lt
@@ -58,6 +60,51 @@ def print_menu () -> None:
     print("  4- Cargar requerimiento 3.")
     print("  5- Cargar requerimiento 4.")
     print("  6- Cargar requerimiento 5.")
+
+
+
+
+#####-----#####-----#####-----#####-----#####-----#####   ######---######---######   #####-----#####-----#####-----#####-----#####-----#####
+#####-----#####-----#####-----#####-----#####-----#####   FUNCIONES CARGA DE DATOS   #####-----#####-----#####-----#####-----#####-----#####
+#####-----#####-----#####-----#####-----#####-----#####   ######---######---######   #####-----#####-----#####-----#####-----#####-----#####
+
+"""
+    Se definen las funciones que permitirán inicializar el catálogo del museo y cargar
+    los elementos de la base de datos.
+
+"""
+
+# Función que inicializa el catálogo del museo.
+def init_catalog () -> dict:
+    """
+        Inicializa el catálogo del museo.
+
+        No tiene parámtros.
+        
+        Retorno:
+            -> (dict): el catálogo del museo.
+
+    """
+    # Crear variable que guarda el catálogo y retornarlo.
+    # Este se crea mediante la función homónima de controller.py.
+    catalog = controller.init_catalog()
+    return catalog
+
+
+
+# Función que carga todos los datos al catálogo.
+def load_data (catalog: dict) -> None:
+    """
+        Esta función carga todos los datos de interés de la carpeta Data/MoMA.
+
+        Parámetro:
+            -> catalog (dict): catálogo.
+
+        No tiene retorno.
+
+    """
+    # Cargar los datos mediante la función homónima de controller.py.
+    controller.load_data(catalog)
 
 
 
@@ -102,6 +149,25 @@ while True:
             print("""\n======================= Carga de Datos =======================\n""")
             print("Cargando información al catálogo ...")
 
+            # Inicializar catálogo.
+            catalog = init_catalog()
+
+            # Iniciar el tiempo.
+            start_time = time.process_time()
+
+            # Cargar datos al catálogo.
+            load_data(catalog)
+
+            # Parar el tiempo.
+            stop_time = time.process_time()
+
+            # Calcular tiempo de ejecución en milisegundos.
+            elapsed_time_mseg = (stop_time - start_time)*1000
+
+            # Imprimir mensaje de éxito.
+            print("\n<> Información cargada con éxito. <>")
+            print("Tiempo de ejecución:", elapsed_time_mseg, "milisegundos.")
+            print("En total hay", mp.size(catalog['city']), "ciudades en las que hubo avistamientos.")
 
 
         # Opción salir.
