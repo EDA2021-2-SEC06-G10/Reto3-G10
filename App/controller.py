@@ -87,13 +87,12 @@ def load_data (catalog: dict) -> None:
 
 
 
+#####-----#####-----#####-----#####-----#####   ########-----#####-----########   #####-----#####-----#####-----#####-----#####
+#####-----#####-----#####-----#####-----#####   FUNCIONES CONEXIÓN MODEL Y VIEW   #####-----#####-----#####-----#####-----#####
+#####-----#####-----#####-----#####-----#####   ########-----#####-----########   #####-----#####-----#####-----#####-----#####
 
+"""
+    Se definen las funciones que permitirán invocar las funciones referentes a
+    la solución de los requerimientos, las cuales se encuentan en model.py.
 
-
-# Inicialización del Catálogo de libros
-
-# Funciones para la carga de datos
-
-# Funciones de ordenamiento
-
-# Funciones de consulta sobre el catálogo
+"""
