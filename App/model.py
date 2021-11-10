@@ -106,6 +106,10 @@ def new_catalog () -> dict:
     # que contienen los avistamientos que tienen dicha duración.
     catalog['duration (seconds)'] = om.newMap('RBT')
 
+    # Mapa ordenado cuyas llaves son fechas de tipo YYYY-MM-DD y cuyos valores son listas enlazadas
+    # que contienen los avistamientos que fueron registrados en dicha fecha.
+    catalog['date'] = om.newMap('RBT')
+
 
     # Retorno.
     return catalog
@@ -287,7 +291,7 @@ def add_latitude (om_latitude: dict, param_latitude: float, sighting: dict) -> N
 # Función que agrega una pareja llave-valor al map "duration (seconds)".
 def add_duration (catalog: dict, param_duration: int, sighting: dict) -> None:
     """
-        Esta función permite agregar una parparam_durationeja llave-valor al map "duration (seconds)" del catálogo.
+        Esta función permite agregar una pareja llave-valor al map "duration (seconds)" del catálogo.
         
         La llave deberá ser una duración, es decir, un número entero.
         El valor será una lista enlazada cuyos elementos son diccionarios que
@@ -327,6 +331,53 @@ def add_duration (catalog: dict, param_duration: int, sighting: dict) -> None:
         new_lt_duration_sigh = lt.newList('ARRAY_LIST')
         lt.addLast(new_lt_duration_sigh, sighting)
         om.put(om_duration, param_duration, new_lt_duration_sigh)
+
+
+
+# Función que agrega una pareja llave-valor al map 'date'.
+def add_date (catalog: dict, param_date, sighting: dict) -> None:
+    """
+        Esta función permite agregar una pareja llave-valor al map 'date' del catálogo.
+        
+        La llave deberá ser una fecha de la forma YYYY-MM-DD, es decir, una cadena de caracteres.
+        El valor será una lista enlazada cuyos elementos son diccionarios que
+        representan un avistamiento (para más detalle de qué información contienen estos
+        diccionarios, revisar la documentación de la función new_sighting()).
+
+        En caso de que la pareja date-sighting_list ya exista, se añadirá el avistamiento al sighting_list
+        referente a la fecha respectiva (la llave).
+        En caso de que la pareja date-sighting_list no exista, se creará la lista que contiene a los
+        avistamientos registrados en dicha fecha, se añadirá la información del avistamiento a dicha lista
+        y se añadirá la nueva pareja date-sighting_list al mapa 'date' del catálogo.
+
+        Parámetros:
+            -> catalog (dict): catálogo.
+            -> param_date (str): fecha del avistamiento.
+            -> sighting (dict): diccionario que representa al avistamiento que se quiere añadir.
+
+        No tiene retorno.
+
+    """
+
+    om_date = catalog["date"]                                       # Guardar el mapa 'date'.
+    mod_date = dt.datetime.strptime(param_date[0:10], '%Y-%m-%d')   # Guardar fecha modificada.
+    exists = om.contains(om_date, mod_date)                         # Determinar si la pareja llave-valor ya existe.
+
+    # Si ya existe la pareja llave-valor.
+    if (exists):
+
+        # Crear variable que guarda la lista de los avistamientos registrados en mod_date
+        # y añadir a esta el avistamiento.
+        lt_date_sigh = om.get(om_date, mod_date)["value"]
+        lt.addLast(lt_date_sigh, sighting)
+
+    # Si no existe la pareja llave-valor.
+    else:
+
+        # Crear una nueva lista de los avistamientos, añadir el avistamiento y añadir la pareja al map.
+        new_lt_date_sigh = lt.newList('SINGLE_LINKED')
+        lt.addLast(new_lt_date_sigh, sighting)
+        om.put(om_date, mod_date, new_lt_date_sigh)
 
 
 
@@ -475,6 +526,7 @@ def cmp_by_city_country (sight_1: dict, sight_2: dict) -> bool:
     return less_than
 
 
+
 # Función de comparación del req. 5.
 def cmp_by_coordinates (sight_1: dict, sight_2: dict) -> bool:
     """
@@ -557,7 +609,7 @@ def req_2 (catalog: dict, param_min_duration: int, param_max_duration: int) -> t
     om_duration = catalog['duration (seconds)']        # Guardar mapa 'duration (seconds)'.
     lt_sight_return = lt.newList('ARRAY_LIST')         # Crear lista de retorno.
 
-    # Crear variables que guardan el ceiling y el floor de las longitudes inferior y superior.
+    # Crear variables que guardan el ceiling y el floor de las duraciones inferior y superior.
     min_duration = om.ceiling(om_duration, param_min_duration)
     max_duration = om.floor(om_duration, param_max_duration)
 
@@ -575,6 +627,46 @@ def req_2 (catalog: dict, param_min_duration: int, param_max_duration: int) -> t
     size_lt_sight_return = lt.size(ordered_lt_sight_return)
     return (size_lt_sight_return, ordered_lt_sight_return)
 
+
+
+# Requerimiento 4.
+def req_4 (catalog: dict, param_min_date: str, param_max_date: str) -> tuple:
+    """
+        Dado un rango de fechas, esta función retorna una tupla que contiene un arreglo que almacena los avistamientos
+        que fueron registrados entre dicho rango y su tamaño.
+
+        Parámetros:
+            -> catalog (dict): catálogo.
+            -> param_min_date (str): límite inferior rango fechas.
+            -> param_max_date (str): límite superior rango fechas.
+
+        Retorno:
+            -> (tuple): tupla con los elementos mencionados.
+    
+    """
+
+    om_date = catalog['date']                       # Guardar mapa 'date'.
+    lt_sight_return = lt.newList('ARRAY_LIST')      # Crear lista de retorno.
+
+    # Volver las fechas dadas por parámetro comparables.
+    mod_min_date = dt.datetime.strptime(param_min_date, '%Y-%m-%d')
+    mod_max_date = dt.datetime.strptime(param_max_date, '%Y-%m-%d')
+
+    # Crear variables que guardan el ceiling y el floor de las fechas inferior y superior.
+    min_date = om.ceiling(om_date, mod_min_date)
+    max_date = om.floor(om_date, mod_max_date)
+
+    # Recorrer todas las llaves del mapa 'date' que se encuentran dentro del rango.
+    for date in lt.iterator(om.keys(om_date, min_date, max_date)):
+        
+        # Guardar lista de avistamientos en date, iterarla y añadir todos sus elementos a lt_sight_return.
+        lt_sightings = om.get(om_date, date)['value']
+        for sighting in lt.iterator(lt_sightings):
+            lt.addLast(lt_sight_return, sighting)
+
+    # Determianr tamaño lt_sight_return, empaquetar y retornar.
+    size_lt_sight_return = lt.size(lt_sight_return)
+    return (size_lt_sight_return, lt_sight_return)
 
 
 

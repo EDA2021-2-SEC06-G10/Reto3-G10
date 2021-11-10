@@ -26,6 +26,7 @@
 
 import config as cf
 import model
+import datetime as dt
 from DISClib.ADT import orderedmap as om
 from DISClib.ADT import map as mp
 from DISClib.ADT import list as lt
@@ -89,11 +90,13 @@ def load_data (catalog: dict) -> None:
         duration = sighting['duration (seconds)']       # Guardar su duración en segundos.
         longitude = sighting['longitude']               # Guardar su longitud.
         latitude = sighting['latitude']                 # Guardar su latitud.
+        date = sighting['datetime']                     # Guardar su fecha.
         
-        model.add_sighting(catalog, sighting)                       # Añadirlo a la lista 'sightings'.
-        model.add_city(catalog, city, sighting)                     # Añadirlo al mapa 'city'.
-        model.add_duration(catalog, duration, sighting)             # Añadirlo al map 'duration (seconds)'.
-        model.add_longitude(catalog, longitude, latitude, sighting) # Añadirlo al map 'longitud'.
+        model.add_sighting(catalog, sighting)                        # Añadirlo a la lista 'sightings'.
+        model.add_city(catalog, city, sighting)                      # Añadirlo al mapa 'city'.
+        model.add_duration(catalog, duration, sighting)              # Añadirlo al map 'duration (seconds)'.
+        model.add_longitude(catalog, longitude, latitude, sighting)  # Añadirlo al map 'longitud'.
+        model.add_date(catalog, date, sighting)                      # Añadirlo al map 'date'.
 
 
 
@@ -149,7 +152,27 @@ def req_2 (catalog: dict, param_min_duration: int, param_max_duration: int) -> t
     ans_req_2 = model.req_2(catalog, param_min_duration, param_max_duration)
     return ans_req_2
 
+
+
+# Requerimiento 4.
+def req_4 (catalog: dict, param_min_date: str, param_max_date: str) -> tuple:
+    """
+        Dado un rango de fechas, esta función retorna una tupla que contiene un arreglo que almacena los avistamientos
+        que fueron registrados entre dicho rango y su tamaño.
+
+        Parámetros:
+            -> catalog (dict): catálogo.
+            -> param_min_date (str): límite inferior rango fechas.
+            -> param_max_date (str): límite superior rango fechas.
+
+        Retorno:
+            -> (tuple): tupla con los elementos mencionados.
     
+    """
+    # Invocar función del req. 4 y retornar su respuesta.
+    ans_req_4 = model.req_4(catalog, param_min_date, param_max_date)
+    return ans_req_4
+
 
 # Requerimiento 5.
 def req_5 (catalog: dict, min_long: float, max_long: float, min_lat: float, max_lat: float) -> tuple:
@@ -180,24 +203,21 @@ def req_5 (catalog: dict, min_long: float, max_long: float, min_lat: float, max_
 catalog = init_catalog()
 load_data(catalog)
 
-'''
-size, lt_sight = model.req_5(catalog, -109.05, -103, 31.33, 37)
+lt_s = catalog['sightings']
+
+size, lt_sight = model.req_4(catalog, '1945-08-06', '1984-11-15')
+ 
+
 
 print(size)
 
-for i in lt.iterator(lt_sight):
-    print(i['latitude'], i['longitude'])
-'''
+for i in range(1,4):
+    sigh = lt.getElement(lt_sight, i)
+    print(sigh['datetime'])
 
-size, lt_sight = model.req_2(catalog, 30, 150)
-
-print(size)
-for i in range(1, 4):
-    print(lt.getElement(lt_sight, i)['datetime'], lt.getElement(lt_sight, i)['duration (seconds)'])
-for i in range(size -2, size + 1):
-    print(lt.getElement(lt_sight, i)['datetime'], lt.getElement(lt_sight, i)['duration (seconds)'])
-
-
+for i in range(size - 2, size + 1):
+    sigh = lt.getElement(lt_sight, i)
+    print(sigh['datetime'])
 
 
 #'''

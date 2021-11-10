@@ -21,12 +21,14 @@ MARTES 9/11:
  View:
   1- Se modificó la función print_load_data() para que imprimiera la info. de interés de al momento de cargar.
 
-MARTES 9/11:
+MIÉRCOLES 10/11:
  Model:
-  1- Se modificó la función new_catalog() para añadir el mapa 'duration (seconds)'.
-  2- Se definió la función cmp_by_city_country().
+  1- Se modificó la función new_catalog() para añadir los mapas 'duration (seconds)' y 'date'.
+  2- Se definieron las funciones cmp_by_city_country(), add_date() y req_4().
+  3- 
  Controller:
-  1- Se definieron las funciones req_2() y req_5().
+  1- Se definieron las funciones req_2(), req_5() y req_4().
+  2- Se modificó la función load_data() para añadir parejas llave-valor al mapa 'date'.
  View:
   1- Se modificó la función print_req_1().
   2- Se definió la función print_req_2().
