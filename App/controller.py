@@ -26,6 +26,8 @@
 
 import config as cf
 import model
+from DISClib.ADT import orderedmap as om
+from DISClib.ADT import map as mp
 from DISClib.ADT import list as lt
 import csv
 
@@ -84,12 +86,17 @@ def load_data (catalog: dict) -> None:
         
         sighting = model.new_sighting(sighting_info)    # Crear diccionario con la información del avistamiento.
         city = sighting['city']                         # Guardar su ciudad.
+        longitude = sighting['longitude']               # Guardar su longitud.
+        latitude = sighting['latitude']                 # Guardar su latitud.
 
         # Añadirlo a la lista 'sightings'.
         model.add_sighting(catalog, sighting)
 
         # Añadirlo al mapa 'city'.
         model.add_city(catalog, city, sighting)
+
+        # Añadirlo al map 'longitud'.
+        model.add_longitude(catalog, longitude, latitude, sighting)
 
 
 
@@ -125,19 +132,19 @@ def req_1 (catalog: dict, param_city: str) -> dict:
     ans_req_1 = model.req_1(catalog, param_city)
     return ans_req_1
 
-'''
+#'''
 # Pruebas.
 catalog = init_catalog()
 load_data(catalog)
 
-size, ltt = model.req_1(catalog, 'las vegas')
+size, lt_sight = model.req_5(catalog, -109.05, -103, 31.33, 37)
+
 print(size)
 
-for i in range(1,4):
-    elem = lt.getElement(ltt, i)
-    print(elem['datetime'])
+for i in lt.iterator(lt_sight):
+    print(i['latitude'], i['longitude'])
 
-for i in range(size - 2, size + 1):
-    elem = lt.getElement(ltt, i)
-    print(elem['datetime'])
-'''
+
+
+
+#'''

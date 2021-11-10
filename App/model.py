@@ -31,6 +31,7 @@
 import config as cf
 import datetime as dt
 from DISClib.ADT import list as lt
+from DISClib.ADT import orderedmap as om
 from DISClib.ADT import map as mp
 from DISClib.DataStructures import mapentry as me
 from DISClib.Algorithms.Sorting import mergesort as mg
@@ -94,6 +95,10 @@ def new_catalog () -> dict:
     # en dicha ciudad.
     catalog["city"] = mp.newMap(80333, maptype='CHAINING', loadfactor = 4.0)
 
+    # Mapa ordenado cuyas llaves son longitudes y cuyos valores son mapas ordenados.
+    # Estos últimos tendrán como llaves latitudes y como valores listas enlazadas
+    # que contendrán la información de los avistamientos que tienen dichas latitudes y longitudes.
+    catalog['longitude'] = om.newMap('RBT')
 
 
     # Retorno.
@@ -174,7 +179,103 @@ def add_city (catalog: dict, param_city: str, sighting: dict) -> None:
         # Crear una nueva lista de los avistamientos, añadir el avistamiento y añadir la pareja al map.
         new_lt_city_sigh = lt.newList('ARRAY_LIST')
         lt.addLast(new_lt_city_sigh, sighting)
-        mp.put(mp_city, param_city, new_lt_city_sigh)    
+        mp.put(mp_city, param_city, new_lt_city_sigh)
+
+
+
+# Función que permite agregar parejas llave valor al mapa 'longitude'.
+def add_longitude (catalog: dict, param_longitude: float, param_latitude: float , sighting: dict) -> None:
+    """
+        Dada la longitud de un avistamiento, esta función permite añadir una pareja longitude-om_latitude al RBT
+        'longitude' del catálogo.
+
+        La llave deberá ser una longitud, es decir, un número decimal.
+        El valor será un árbol rojo-negro cuyos cuyas llaves serán latitudes y cuyos valores serán listas enlazadas
+        que contienen los avistamientos que fueron registrados en la coordenada (param_longitude, param_latitude).
+        Para más información acerca de dichos árboles, revisar la documentación de la función add_latitude().
+
+        En caso de que la pareja longitude-om_latitude ya exista, se añadirá el avistamiento al om_latitude
+        referente a param_longitude.
+        En caso de que la pareja longitude-om_latitude no exista, se creará un nuevo om_latitude que contiene a los
+        avistamientos reigistrados en la coordenada (param_longitude, param_latitude), se añadirá la información del 
+        avistamiento a dicho árbol y se añadirá la nueva pareja longitude-om_latitude al map "longitude" del catálogo.
+
+        Parámetros:
+            -> catalog (dict): catálogo.
+            -> param_longitude (float): longitud del avistaminto.
+            -> param_latitude (float): latitud del avistaminto.
+            -> sighting (dict): información del avistamiento.
+
+        No tiene retornos.
+    
+    """
+
+    om_longitude = catalog['longitude']             # Guardar mapa 'longitude'.
+    exists = om.get(om_longitude, param_longitude)  # Determinar si la la llave param_longitude está en el mapa.
+
+    # Si existe.
+    if (exists):
+        
+        # Guardar el om_latitude y añadir la info. del avistamiento a dicho.
+        om_latitude = om.get(om_longitude, param_longitude)['value']
+        add_latitude(om_latitude, param_latitude, sighting)
+
+
+    # De lo contrario.
+    else:
+
+        # Crear un nuevo om_latitude, añadir la pareja latitude-lt_sightings a dicho y añadir la pareja
+        # longitude-om_latitude al mapa 'longitude'.
+        new_om_latitude = om.newMap('RBT')
+        add_latitude(new_om_latitude, param_latitude, sighting)
+        om.put(om_longitude, param_longitude, new_om_latitude)
+
+    
+
+
+
+# Función que agrega una pareja llave-valor a los mapas om_latitude.
+def add_latitude (om_latitude: dict, param_latitude: float, sighting: dict) -> None:
+    """
+        Esta función permite agregar parejas llave-valor a un mapa om_latitude. Estos se encuentran almacenados
+        como valores de las parejas del mapa 'longitude' del catálogo.
+        
+        La llave deberá ser una latitud, es decir, un número decimal.
+        El valor será una lista enlazada cuyos elementos son diccionarios que representan un avistamiento
+        (para más detalle de qué información contienen estos diccionarios, revisar la documentación de la función 
+        new_sighting()).
+
+        En caso de que la pareja latitude-lt_sightings ya exista, se añadirá el avistamiento al lt_sightings.
+        En caso de que la pareja latitude-lt_sightings no exista, se creará dicha lista, se añadirá la información
+        del avistamiento a dicha lista y se añadirá la nueva pareja latitude-lt_sightings al map om_latitude respectivo.
+
+        Parámetros:
+            -> om_latitude (dict): mapa ordenado que contiene parejas latitude-lt_sightings.
+            -> param_latitude (float): latitud del avistaminto.
+            -> sighting (dict): información del avistamiento.
+
+        No tiene retorno.
+
+    """
+
+    # Determinar si existe la llave param_latitude en om_latitude.
+    exists = om.get(om_latitude, param_latitude)
+
+    # Si existe.
+    if (exists):
+
+        # Guardar la lt_sightings y añadir el avistamiento a dicha.
+        lt_sightings = om.get(om_latitude, param_latitude)['value']
+        lt.addLast(lt_sightings, sighting)
+
+    # De lo contrario.
+    else:
+
+        # Crear nuevo lt_sightings, añadir el avistamiento a dicha y añadir la pareja al om_latitude.
+        new_lt_sightings = lt.newList('SINGLE_LINKED')
+        lt.addLast(new_lt_sightings, sighting)
+        om.put(om_latitude, param_latitude, new_lt_sightings)
+
     
 
 
@@ -237,6 +338,12 @@ def new_sighting (sighting_info: dict) -> dict:
     for key in sighting:
         if (sighting[key] == ''):
             sighting[key] = 'N.A.'
+    
+    # Convertir y apoximar latitud y longitud a decimales de dos cifras.
+    if not (sighting['latitude'] == 'N.A.'):
+        sighting['latitude'] = round(float(sighting['latitude']), 2)
+    if not (sighting['longitude'] == 'N.A.'):
+        sighting['longitude'] = round(float(sighting['longitude']), 2)
 
     # Retornar el avistamiento.
     return sighting
@@ -291,6 +398,30 @@ def cmp_by_datetime (sight_1: dict, sight_2: dict) -> bool:
 
 
 
+# Función de comparación del req. 5.
+def cmp_by_coordinates (sight_1: dict, sight_2: dict) -> bool:
+    """
+        Dada la infomación de dos avistamientos, esta función determina si tanto la latitud como la longitud
+        de sight_1 son menores que la latitud y la longitud de sight_2 (respectivamente).
+
+        Parámetros:
+            -> sight_1 (dict): info. primer avistamiento.
+            -> sight_2 (dict): info. segundo avistamiento.
+
+        Retorno:
+            -> (bool): True si se cumple la condición indicada.
+                       False de lo contrario.
+    
+    """
+    less_than = False               # Inicializar variable de retorno.
+
+    # Determinar si se cumplen ambas condiciones estipuladas y retornar respuesta.
+    latitude_less = (sight_1['latitude'] < sight_2['latitude'])
+    longitude_less = (sight_1['longitude'] < sight_2['longitude'])
+    less_than = True if (latitude_less and longitude_less) else False
+    return less_than
+
+
 
 
 #####-----#####-----#####-----#####-----#####   #####---#######----#####   #####-----#####-----#####-----#####-----#####
@@ -323,22 +454,68 @@ def req_1 (catalog: dict, param_city: str) -> dict:
     mp_city = catalog['city']                            # Guardar mapa 'city'.
     lt_sight = mp.get(mp_city, param_city)['value']      # Guardar arreglo avistamientos de la ciudad.
 
-    # Determinar tamaño y ordenar lista avistamientos, empquetarlos y retornar.
+    # Determinar tamaño y ordenar lista avistamientos, empaquetarlos y retornar.
     size_lt_sight = lt.size(lt_sight)
     ord_lt_sight = mg.sort(lt_sight, cmp_by_datetime)
     return (size_lt_sight, ord_lt_sight)
 
 
 
+# Requerimiento 5.
+def req_5 (catalog: dict, min_long: float, max_long: float, min_lat: float, max_lat: float) -> tuple:
+    """
+        Dada una zona geográfica definida por un rango de longitudes y latitudes, esta función retorna una tupla
+        que contiene un arreglo que contiene los avistamientos que se registraron en dentro de dicha zona y su tamaño.
+
+        Esta función asume que el rango de longitudes y latitudes es válido.
+
+        Parámetros:
+            -> catalog (dict): catálogo.
+            -> min_long (float): límite mínimo de longitud.
+            -> max_long (float): límite máximo de longitud.
+            -> min_lat (float): límite mínimo de latitud.
+            -> max_lat (float): límite máximo de latitud.
+
+        Retorno:
+            -> (tuple): tupla con los elementos mencionados.
+    
+    """
+
+    om_longitude = catalog['longitude']         # Guardar mapa 'longitude'.
+    return_list = lt.newList('ARRAY_LIST')      # Crear lista de retorno.
+
+    # Crear variables que guardan el floor y el ceiling de las longitudes inferior y superior.
+    floor_long = om.ceiling(om_longitude, min_long)
+    ceil_long = om.floor(om_longitude, max_long)
 
 
+    # Crear iterador del rango [floor_long, ceil_long] e iterar sobre este.
+    iterator_long = lt.iterator(om.keys(om_longitude, floor_long, ceil_long))
+    for longitude in iterator_long:
 
-#####-----#####-----#####-----#####-----#####   #####---####----#####   #####-----#####-----#####-----#####-----#####
-#####-----#####-----#####-----#####-----#####   FUNCIONES ADICIONALES   #####-----#####-----#####-----#####-----#####
-#####-----#####-----#####-----#####-----#####   #####---####----#####   #####-----#####-----#####-----#####-----#####
+        # Determinar si existe la llave longitude en om_longitude.
+        exists = om.get(om_longitude, longitude)
 
-"""
-    A continuación se definen funciones que serán necesarias para desarrollar los
-    requerimientos, o que serán de utilidad en general.
 
-"""
+        # Si existe la pareja longitude-om_latitude en om_longitude.
+        if (exists):
+
+            # Guardar el om_latitude de longitude, crear su iterador e iterar sobre este.
+            om_latitude = om.get(om_longitude, longitude)['value']
+            iterator_om_latitude = lt.iterator(om.keys(om_latitude, om.minKey(om_latitude), om.maxKey(om_latitude)))
+            for latitude in iterator_om_latitude:
+                
+                # Determinar si latitud está entre el rango [min_lat, max_lat].
+                valid = (latitude >= min_lat and latitude <= max_lat)
+
+                # Si es válido.
+                if (valid):
+                    # Guardar lt_sightings, recorrerla y añadir cada avistamiento a return_list.
+                    lt_sightings = om.get(om_latitude, latitude)['value']
+                    for element in (lt.iterator(lt_sightings)):
+                        lt.addLast(return_list, element)
+
+        
+    # Determinar tamaño, empaquetar variables y retornar.
+    size_return_list = lt.size(return_list)
+    return(size_return_list, return_list)
