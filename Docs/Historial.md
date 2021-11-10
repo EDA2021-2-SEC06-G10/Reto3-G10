@@ -17,7 +17,7 @@ MARTES 9/11:
   4- Se actualizó la función new_catalog() para añadir al mapa 'latitude'.
   5- Se actualizó la función new_sighting() para que los datos 'longitude' y 'latitude' se añadieran como floats de dos decimales.
   6- Se definieron las funciones add_latitude() y add_longitude().
-  7- Se definieron las funciones cmp_by_coordinates() y req_5() para el requerimiento 5.
+  7- Se definieron las funciones cmp_by_coordinates() y req_5() para el requerimiento 5.    
  Controller:
   1- 
  View:
