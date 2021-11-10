@@ -135,17 +135,60 @@ def print_req_1 (param_city: str, ans_req_1: tuple) -> None:
         No tiene retorno.
 
     """
-
+    
+    # Desempaquetar respuesta.
     size, lt_sight = ans_req_1
-    print(size)
+    
+    # Respuesta tamaño.
+    print('La base de datos tiene un resigtro de', size, 'avistamientos en la ciudad:', param_city + '.')
+    
+    # Lista.
+    print('Una muestra de la información de algunos de estos avistamientos se dispone a contiuación:\n')
+    print("#" * 148)
+    print("# ", end = " ")
+    print(fixed_length('FECHA', 38), end = " # ")
+    print(fixed_length('CIUDAD', 40), end = " # ")
+    print(fixed_length('PAÍS', 8), end = " # ")
+    print(fixed_length('FORMA', 30), end = " # ")
+    print(fixed_length('DURACIÓN (S)', 14), end = " # ")
+    print()
+    print("#" * 148) 
 
-    for i in range(1,4):
-        elem = lt.getElement(lt_sight, i)
-        print(elem['datetime'])
+    # Si hay menos de 6 avistamientos.
+    if (size < 6):
+        for sighting in lt.iterator(lt_sight):
+            print("# ", end = " ")
+            print(fixed_length(sighting['datetime'], 38), end = " # ")
+            print(fixed_length(sighting['city'], 40), end = " # ")
+            print(fixed_length(sighting['country'], 8), end = " # ")
+            print(fixed_length(sighting['shape'], 30), end = " # ")
+            print(fixed_length(sighting['duration (seconds)'], 14), end = " # ")
+            print()
+        print("#" * 148)
 
-    for i in range(size - 2, size + 1):
-        elem = lt.getElement(lt_sight, i)
-        print(elem['datetime'])
+    # Si hay 6 o más.
+    else:
+        for i in range(1,4):
+            sighting = lt.getElement(lt_sight, i)
+            print("# ", end = " ")
+            print(fixed_length(sighting['datetime'], 38), end = " # ")
+            print(fixed_length(sighting['city'], 40), end = " # ")
+            print(fixed_length(sighting['country'], 8), end = " # ")
+            print(fixed_length(sighting['shape'], 30), end = " # ")
+            print(fixed_length(sighting['duration (seconds)'], 14), end = " # ")
+            print()
+        for i in range(size - 2, size):
+            sighting = lt.getElement(lt_sight, i)
+            print("# ", end = " ")
+            print(fixed_length(sighting['datetime'], 38), end = " # ")
+            print(fixed_length(sighting['city'], 40), end = " # ")
+            print(fixed_length(sighting['country'], 8), end = " # ")
+            print(fixed_length(sighting['shape'], 30), end = " # ")
+            print(fixed_length(sighting['duration (seconds)'], 14), end = " # ")
+            print()
+        print("#" * 148)
+    print()
+    
 
 
 
