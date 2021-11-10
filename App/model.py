@@ -28,6 +28,7 @@
 #####-----#####-----#####-----#####-----#####   IMPORTACIÓN MÓDULOS   #####-----#####-----#####-----#####-----#####
 #####-----#####-----#####-----#####-----#####   ####---#####---####   #####-----#####-----#####-----#####-----#####
 
+from sys import intern
 import config as cf
 import datetime as dt
 from DISClib.ADT import list as lt
@@ -35,6 +36,7 @@ from DISClib.ADT import orderedmap as om
 from DISClib.ADT import map as mp
 from DISClib.DataStructures import mapentry as me
 from DISClib.Algorithms.Sorting import mergesort as mg
+from DISClib.Algorithms.Sorting import quicksort as qui
 assert cf
 
 
@@ -100,6 +102,10 @@ def new_catalog () -> dict:
     # que contendrán la información de los avistamientos que tienen dichas latitudes y longitudes.
     catalog['longitude'] = om.newMap('RBT')
 
+    # Mapa ordenado cuyas llaves son duraciones en segundos y cuyos valores son listas enlazadas
+    # que contienen los avistamientos que tienen dicha duración.
+    catalog['duration (seconds)'] = om.newMap('RBT')
+
 
     # Retorno.
     return catalog
@@ -142,7 +148,7 @@ def add_city (catalog: dict, param_city: str, sighting: dict) -> None:
         Esta función permite agregar una pareja llave-valor al map "city" del catálogo.
         
         La llave deberá ser una ciudad, es decir, una cadena de caracteres.
-        El valor será un arrglo cuyos elementos son diccionarios que
+        El valor será un arreglo cuyos elementos son diccionarios que
         representan un avistamiento (para más detalle de qué información contienen estos
         diccionarios, revisar la documentación de la función new_sighting()).
 
@@ -276,7 +282,52 @@ def add_latitude (om_latitude: dict, param_latitude: float, sighting: dict) -> N
         lt.addLast(new_lt_sightings, sighting)
         om.put(om_latitude, param_latitude, new_lt_sightings)
 
-    
+
+
+# Función que agrega una pareja llave-valor al map "duration (seconds)".
+def add_duration (catalog: dict, param_duration: int, sighting: dict) -> None:
+    """
+        Esta función permite agregar una parparam_durationeja llave-valor al map "duration (seconds)" del catálogo.
+        
+        La llave deberá ser una duración, es decir, un número entero.
+        El valor será una lista enlazada cuyos elementos son diccionarios que
+        representan un avistamiento (para más detalle de qué información contienen estos
+        diccionarios, revisar la documentación de la función new_sighting()).
+
+        En caso de que la pareja duration-sighting_list ya exista, se añadirá el avistamiento al sighting_list
+        referente a la duración respectiva (la llave).
+        En caso de que la pareja duration-sighting_list no exista, se creará la lista que contiene a los
+        avistamientos de dicha duración, se añadirá la información del avistamiento a dicha lista
+        y se añadirá la nueva pareja duration-sighting_list al map "duration (seconds)" del catálogo.
+
+        Parámetros:
+            -> catalog (dict): catálogo.
+            -> param_duration (int): duración del avistamiento.
+            -> sighting (dict): diccionario que representa al avistamiento que se quiere añadir.
+
+        No tiene retorno.
+
+    """
+
+    om_duration = catalog["duration (seconds)"]         # Guardar el mapa 'duration (seconds)'.
+    exists = om.contains(om_duration, param_duration)   # Determinar si la pareja llave-valor ya existe.
+
+    # Si ya existe la pareja llave-valor.
+    if (exists):
+
+        # Crear variable que guarda la lista de los avistamientos de duración param_duration
+        # y añadir a esta el avistamiento.
+        lt_duration_sigh = om.get(om_duration, param_duration)["value"]
+        lt.addLast(lt_duration_sigh, sighting)
+
+    # Si no existe la pareja llave-valor.
+    else:
+
+        # Crear una nueva lista de los avistamientos, añadir el avistamiento y añadir la pareja al map.
+        new_lt_duration_sigh = lt.newList('ARRAY_LIST')
+        lt.addLast(new_lt_duration_sigh, sighting)
+        om.put(om_duration, param_duration, new_lt_duration_sigh)
+
 
 
 
@@ -339,7 +390,9 @@ def new_sighting (sighting_info: dict) -> dict:
         if (sighting[key] == ''):
             sighting[key] = 'N.A.'
     
-    # Convertir y apoximar latitud y longitud a decimales de dos cifras.
+    # Convertir y apoximar duración, latitud y longitud a decimales de dos cifras.
+    if not (sighting['duration (seconds)'] == 'N.A.'):
+        sighting['duration (seconds)'] = int(float(sighting['duration (seconds)']))
     if not (sighting['latitude'] == 'N.A.'):
         sighting['latitude'] = round(float(sighting['latitude']), 2)
     if not (sighting['longitude'] == 'N.A.'):
@@ -396,6 +449,30 @@ def cmp_by_datetime (sight_1: dict, sight_2: dict) -> bool:
         less_than = True
     return less_than
 
+
+
+# Función de comparación del req. 2.
+def cmp_by_city_country (sight_1: dict, sight_2: dict) -> bool:
+    """
+        Dada la infomación de dos avistamientos, esta función determina si la combinación ciudad-país del primer
+        avistamiento es alfabéticamente menor que la del segundo.
+
+        Parámetros:
+            -> sight_1 (dict): info. primer avistamiento.
+            -> sight_2 (dict): info. segundo avistamiento.
+
+        Retorno:
+            -> (bool): True si se cumple la condición indicada.
+                       False de lo contrario.
+    
+    """
+    less_than = False               # Inicializar variable de retorno.
+
+    # Determinar si se cumplen ambas condiciones estipuladas y retornar respuesta.
+    city_less = (sight_1['city'] < sight_2['city'])
+    country_less = (sight_1['country'] < sight_2['country'])
+    less_than = (city_less and country_less)
+    return less_than
 
 
 # Función de comparación del req. 5.
@@ -461,6 +538,46 @@ def req_1 (catalog: dict, param_city: str) -> dict:
 
 
 
+# Requerimiento 2.
+def req_2 (catalog: dict, param_min_duration: int, param_max_duration: int) -> tuple:
+    """
+        Dado un rango de segundos, esta función retorna una tupla que contiene un arreglo que almacena los avistamientos
+        cuya duración en segundos se encuentra dentro de dicho rango y su tamaño.
+
+        Parámetros:
+            -> catalog (dict): catálogo.
+            -> param_min_duration (int): límite inferior rango duración.
+            -> param_max_duration (int): límite superior rango duración.
+
+        Retorno:
+            -> (tuple): tupla con los elementos mencionados.
+    
+    """
+
+    om_duration = catalog['duration (seconds)']        # Guardar mapa 'duration (seconds)'.
+    lt_sight_return = lt.newList('ARRAY_LIST')         # Crear lista de retorno.
+
+    # Crear variables que guardan el ceiling y el floor de las longitudes inferior y superior.
+    min_duration = om.ceiling(om_duration, param_min_duration)
+    max_duration = om.floor(om_duration, param_max_duration)
+
+    # Recorrer todas las llaves del mapa 'duration (seconds)' que se encuentran dentro del rango.
+    for duration in lt.iterator(om.keys(om_duration, min_duration, max_duration)):
+        
+        # Guardar lista de avistamientos de duration, ordenarla, iterarla y añadir todos sus elementos a lt_sight_return.
+        lt_sightings = om.get(om_duration, duration)['value']
+        ord_lt_sightings = qui.sort(lt_sightings, cmp_by_city_country)
+        for sighting in lt.iterator(ord_lt_sightings):
+            lt.addLast(lt_sight_return, sighting)
+
+    # Ordenar la lista de retorno cronológicamente, determianr su tamaño, empaquetar y retornar.
+    ordered_lt_sight_return = mg.sort(lt_sight_return, cmp_by_datetime)
+    size_lt_sight_return = lt.size(ordered_lt_sight_return)
+    return (size_lt_sight_return, ordered_lt_sight_return)
+
+
+
+
 # Requerimiento 5.
 def req_5 (catalog: dict, min_long: float, max_long: float, min_lat: float, max_lat: float) -> tuple:
     """
@@ -484,7 +601,7 @@ def req_5 (catalog: dict, min_long: float, max_long: float, min_lat: float, max_
     om_longitude = catalog['longitude']         # Guardar mapa 'longitude'.
     return_list = lt.newList('ARRAY_LIST')      # Crear lista de retorno.
 
-    # Crear variables que guardan el floor y el ceiling de las longitudes inferior y superior.
+    # Crear variables que guardan el ceiling y el floor de las longitudes inferior y superior.
     floor_long = om.ceiling(om_longitude, min_long)
     ceil_long = om.floor(om_longitude, max_long)
 

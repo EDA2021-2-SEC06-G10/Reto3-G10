@@ -86,17 +86,14 @@ def load_data (catalog: dict) -> None:
         
         sighting = model.new_sighting(sighting_info)    # Crear diccionario con la información del avistamiento.
         city = sighting['city']                         # Guardar su ciudad.
+        duration = sighting['duration (seconds)']       # Guardar su duración en segundos.
         longitude = sighting['longitude']               # Guardar su longitud.
         latitude = sighting['latitude']                 # Guardar su latitud.
-
-        # Añadirlo a la lista 'sightings'.
-        model.add_sighting(catalog, sighting)
-
-        # Añadirlo al mapa 'city'.
-        model.add_city(catalog, city, sighting)
-
-        # Añadirlo al map 'longitud'.
-        model.add_longitude(catalog, longitude, latitude, sighting)
+        
+        model.add_sighting(catalog, sighting)                       # Añadirlo a la lista 'sightings'.
+        model.add_city(catalog, city, sighting)                     # Añadirlo al mapa 'city'.
+        model.add_duration(catalog, duration, sighting)             # Añadirlo al map 'duration (seconds)'.
+        model.add_longitude(catalog, longitude, latitude, sighting) # Añadirlo al map 'longitud'.
 
 
 
@@ -127,22 +124,78 @@ def req_1 (catalog: dict, param_city: str) -> dict:
             -> (dict): tupla mencionada anteriormente.
 
     """
-    
     # Invocar función del req. 1 y retornar su respuesta.
     ans_req_1 = model.req_1(catalog, param_city)
     return ans_req_1
+
+
+
+# Requerimiento 2.
+def req_2 (catalog: dict, param_min_duration: int, param_max_duration: int) -> tuple:
+    """
+        Dado un rango de segundos, esta función retorna una tupla que contiene un arreglo que almacena los avistamientos
+        cuya duración en segundos se encuentra dentro de dicho rango y su tamaño.
+
+        Parámetros:
+            -> catalog (dict): catálogo.
+            -> param_min_duration (int): límite inferior rango duración.
+            -> param_max_duration (int): límite superior rango duración.
+
+        Retorno:
+            -> (tuple): tupla con los elementos mencionados.
+    
+    """
+    # Invocar función del req. 2 y retornar su respuesta.
+    ans_req_2 = model.req_2(catalog, param_min_duration, param_max_duration)
+    return ans_req_2
+
+    
+
+# Requerimiento 5.
+def req_5 (catalog: dict, min_long: float, max_long: float, min_lat: float, max_lat: float) -> tuple:
+    """
+        Dada una zona geográfica definida por un rango de longitudes y latitudes, esta función retorna una tupla
+        que contiene un arreglo que contiene los avistamientos que se registraron en dentro de dicha zona y su tamaño.
+
+        Esta función asume que el rango de longitudes y latitudes es válido.
+
+        Parámetros:
+            -> catalog (dict): catálogo.
+            -> min_long (float): límite mínimo de longitud.
+            -> max_long (float): límite máximo de longitud.
+            -> min_lat (float): límite mínimo de latitud.
+            -> max_lat (float): límite máximo de latitud.
+
+        Retorno:
+            -> (tuple): tupla con los elementos mencionados.
+    
+    """
+    # Invocar función del req. 5 y retornar su respuesta.
+    ans_req_5 = model.req_5(catalog, min_long, max_long, min_lat, max_lat)
+    return ans_req_5
+
 
 #'''
 # Pruebas.
 catalog = init_catalog()
 load_data(catalog)
 
+'''
 size, lt_sight = model.req_5(catalog, -109.05, -103, 31.33, 37)
 
 print(size)
 
 for i in lt.iterator(lt_sight):
     print(i['latitude'], i['longitude'])
+'''
+
+size, lt_sight = model.req_2(catalog, 30, 150)
+
+print(size)
+for i in range(1, 4):
+    print(lt.getElement(lt_sight, i)['datetime'], lt.getElement(lt_sight, i)['duration (seconds)'])
+for i in range(size -2, size + 1):
+    print(lt.getElement(lt_sight, i)['datetime'], lt.getElement(lt_sight, i)['duration (seconds)'])
 
 
 
