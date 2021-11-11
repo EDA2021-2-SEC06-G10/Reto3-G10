@@ -28,13 +28,11 @@
 #####-----#####-----#####-----#####-----#####   IMPORTACIÓN MÓDULOS   #####-----#####-----#####-----#####-----#####
 #####-----#####-----#####-----#####-----#####   ####---#####---####   #####-----#####-----#####-----#####-----#####
 
-from sys import intern
 import config as cf
 import datetime as dt
 from DISClib.ADT import list as lt
 from DISClib.ADT import orderedmap as om
 from DISClib.ADT import map as mp
-from DISClib.DataStructures import mapentry as me
 from DISClib.Algorithms.Sorting import mergesort as mg
 from DISClib.Algorithms.Sorting import quicksort as qui
 assert cf
@@ -56,14 +54,12 @@ assert cf
 # Función que crea y retorna el catálogo.
 def new_catalog () -> dict:
     """
-        Esta función permite crear la estructura de datos que guarda el catálogo de videos.
-        Esta está compuesta por los siguientes maps:
-            1- city (unordered_map)
+        Esta función permite crear la estructura de datos que guarda el catálogo de avistamientos.
 
         No tiene parámetros.
 
         Retorno:
-            -> (dict): el catálogo del museo.
+            -> (dict): el catálogo.
 
     """
 
@@ -240,8 +236,6 @@ def add_longitude (catalog: dict, param_longitude: float, param_latitude: float 
         add_latitude(new_om_latitude, param_latitude, sighting)
         om.put(om_longitude, param_longitude, new_om_latitude)
 
-    
-
 
 
 # Función que agrega una pareja llave-valor a los mapas om_latitude.
@@ -382,20 +376,6 @@ def add_date (catalog: dict, param_date, sighting: dict) -> None:
 
 
 
-#####-----#####-----#####-----#####-----#####   #####---#######----#####   #####-----#####-----#####-----#####-----#####
-#####-----#####-----#####-----#####-----#####   FUNCIONES DE COMPARACIÓN   #####-----#####-----#####-----#####-----#####
-#####-----#####-----#####-----#####-----#####   #####---#######----#####   #####-----#####-----#####-----#####-----#####
-
-"""
-    A continuación se definen las funciones que permitirán comparar
-    y ordenar los elementos del catálogo (incluyendo las llaves de los maps).
-
-"""
-
-
-
-
-
 #####-----#####-----#####-----#####-----#####   ###---####----###   #####-----#####-----#####-----#####-----#####
 #####-----#####-----#####-----#####-----#####   CREACIÓN DE DATOS   #####-----#####-----#####-----#####-----#####
 #####-----#####-----#####-----#####-----#####   ###---####----###   #####-----#####-----######-----####-----#####
@@ -461,7 +441,7 @@ def new_sighting (sighting_info: dict) -> dict:
 
 """
     A continuación se definen las funciones que permitirán comparar
-    y ordenar los elementos del catálogo (incluyendo las llaves de los maps).
+    y ordenar los elementos del catálogo (incluyendo las llaves de los mapas).
 
 """
 

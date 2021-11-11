@@ -64,7 +64,7 @@ def print_menu () -> None:
 
 
 
-# Función que impre información relacionada a la carga de datos.
+# Función que imprime la información relacionada a la carga de datos.
 def print_load_data (lt_sightings: dict) -> None:
     """
         Dada la lista 'sightings' del catálogo, esta función imprime la información de los primeros
@@ -350,7 +350,7 @@ def print_req_5 (mod_long_low: float, mod_long_sup: float , mod_lat_low: float ,
     size, lt_sight = ans_req_5
     
     # Respuesta tamaño.
-    print('La base de datos tiene un resigtro de', size, 'avistamientos que se registraron entre la latitud del rango', mod_lat_low, 'a', mod_lat_sup, 'y longitud del rango', mod_long_low, 'a', str(mod_long_sup) + '.')
+    print('La base de datos tiene un resigtro de', size, 'avistamientos que se registraron entre la latitud del rango', mod_lat_low, 'a', mod_lat_sup, 'y la longitud del rango', mod_long_low, 'a', str(mod_long_sup) + '.')
     
     # Lista.
     print('Una muestra de la información de algunos de estos avistamientos se dispone a continuación:\n')
@@ -366,8 +366,8 @@ def print_req_5 (mod_long_low: float, mod_long_sup: float , mod_lat_low: float ,
     print()
     print("#" * 147)
 
-    # Si hay menos de 6 avistamientos.
-    if (size < 6):
+    # Si hay menos de 10 avistamientos.
+    if (size < 10):
         for sighting in lt.iterator(lt_sight):
             print("# ", end = " ")
             print(fixed_length(sighting['datetime'], 25), end = " # ")
@@ -380,9 +380,9 @@ def print_req_5 (mod_long_low: float, mod_long_sup: float , mod_lat_low: float ,
             print()
         print("#" * 147)
 
-    # Si hay 6 o más.
+    # Si hay 10 o más.
     else:
-        for i in range(1,4):
+        for i in range(1,6):
             sighting = lt.getElement(lt_sight, i)
             print("# ", end = " ")
             print(fixed_length(sighting['datetime'], 25), end = " # ")
@@ -393,7 +393,7 @@ def print_req_5 (mod_long_low: float, mod_long_sup: float , mod_lat_low: float ,
             print(fixed_length(sighting['latitude'], 15), end = " # ")
             print(fixed_length(sighting['longitude'], 15), end = " # ")
             print()
-        for i in range(size - 2, size + 1):
+        for i in range(size - 4, size + 1):
             sighting = lt.getElement(lt_sight, i)
             print("# ", end = " ")
             print(fixed_length(sighting['datetime'], 25), end = " # ")
@@ -408,25 +408,27 @@ def print_req_5 (mod_long_low: float, mod_long_sup: float , mod_lat_low: float ,
     print()
 
 
+
+
 #####-----#####-----#####-----#####-----#####-----#####   ######---######---######   #####-----#####-----#####-----#####-----#####-----#####
 #####-----#####-----#####-----#####-----#####-----#####   FUNCIONES CARGA DE DATOS   #####-----#####-----#####-----#####-----#####-----#####
 #####-----#####-----#####-----#####-----#####-----#####   ######---######---######   #####-----#####-----#####-----#####-----#####-----#####
 
 """
-    Se definen las funciones que permitirán inicializar el catálogo del museo y cargar
+    Se definen las funciones que permitirán inicializar el catálogo de avistamiento y cargar
     los elementos de la base de datos.
 
 """
 
-# Función que inicializa el catálogo del museo.
+# Función que inicializa el catálogo.
 def init_catalog () -> dict:
     """
-        Inicializa el catálogo del museo.
+        Inicializa el catálogo.
 
         No tiene parámtros.
         
         Retorno:
-            -> (dict): el catálogo del museo.
+            -> (dict): el catálogo.
 
     """
     # Crear variable que guarda el catálogo y retornarlo.
@@ -439,7 +441,7 @@ def init_catalog () -> dict:
 # Función que carga todos los datos al catálogo.
 def load_data (catalog: dict) -> None:
     """
-        Esta función carga todos los datos de interés de la carpeta Data/MoMA.
+        Esta función carga todos los datos de interés de la carpeta Data/UFOS.
 
         Parámetro:
             -> catalog (dict): catálogo.
@@ -505,14 +507,10 @@ def fixed_length (input, lenght: int) -> str:
 
 """
 
-# Crear variable que guardará el catálogo.
-catalog = None
+catalog = None       # Crear variable que guardará el catálogo.
+os.system('cls')     # Limpiar la consola.
 
-# Limpiar la consola.
-os.system('cls')
-
-
-# Iteración usuario.
+# Ciclo indefinido de la herramienta.
 while True:
 
     # Imprimir menú.
@@ -653,6 +651,16 @@ while True:
         
 
 
+        # Si escoge la opción 4.
+        elif int(inputs[0]) == 4:
+            # Imprimir mensaje de error.
+            os.system('cls')
+            print("""\n======================= ERROR =======================\n""")
+            print("Este requerimiento no fue realizado.\n\n")
+            sys.exit(0)
+
+
+
         # Si escoge la opción 5.
         elif int(inputs[0]) == 5:
 
@@ -767,7 +775,7 @@ while True:
             
             # Imprimir mensaje de carga.
             print("""\n======================= Exit =======================\n""")
-            print("Gracias por usar la herramienta. Hasta pronto.\n")
+            print("Gracias por usar la herramienta. Hasta pronto.\n\n")
 
             sys.exit(0)
 
@@ -775,6 +783,7 @@ while True:
 
         # Si se ingresa un valor erróneo.
         else:
+            os.system('cls')        # Limpiar la consola.
             print("""\n======================= ERROR =======================\n""")
             print("Debe ingresar una opción válida.\n\n")
             sys.exit(0)
@@ -783,8 +792,9 @@ while True:
 
     # Si el usuario ingresó una opción inválida.
     except ValueError:
+        os.system('cls')        # Limpiar la consola.
         print("""\n======================= ERROR =======================\n""")
-        print("Debe ingresar una opción válida.\n\n")
+        print("Debe ingresar valores adecuados.\n\n")
         sys.exit(0)
 
 sys.exit(0)

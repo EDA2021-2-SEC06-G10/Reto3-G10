@@ -26,8 +26,6 @@
 
 import config as cf
 import model
-from DISClib.ADT import orderedmap as om
-from DISClib.ADT import map as mp
 from DISClib.ADT import list as lt
 import csv
 
@@ -39,7 +37,7 @@ import csv
 #####-----#####-----#####-----#####-----#####   ##########-----###########-----##########   #####-----#####-----#####-----#####-----#####
 
 """
-    Se definen las funciones que permitirán inicializar el catálogo del museo y cargar
+    Se definen las funciones que permitirán inicializar el catálogo y cargar
     los elementos de la base de datos.
 
 """
@@ -65,8 +63,7 @@ def init_catalog () -> dict:
 # Función que carga toda la información al catálogo.
 def load_data (catalog: dict) -> None:
     """
-        Esta función carga toda la información al catálogo, y lo hace invocando a las 
-        funciones load_artists() y load_artworks.
+        Esta función carga toda la información al catálogo.
 
         Parámetro:
             -> catalog (dict): catálogo.
@@ -173,6 +170,7 @@ def req_4 (catalog: dict, param_min_date: str, param_max_date: str) -> tuple:
     return ans_req_4
 
 
+
 # Requerimiento 5.
 def req_5 (catalog: dict, min_long: float, max_long: float, min_lat: float, max_lat: float) -> tuple:
     """
@@ -195,28 +193,3 @@ def req_5 (catalog: dict, min_long: float, max_long: float, min_lat: float, max_
     # Invocar función del req. 5 y retornar su respuesta.
     ans_req_5 = model.req_5(catalog, min_long, max_long, min_lat, max_lat)
     return ans_req_5
-
-
-#'''
-# Pruebas.
-catalog = init_catalog()
-load_data(catalog)
-
-lt_s = catalog['sightings']
-
-size, lt_sight = model.req_4(catalog, '1945-08-06', '1984-11-15')
- 
-
-
-print(size)
-
-for i in range(1,4):
-    sigh = lt.getElement(lt_sight, i)
-    print(sigh['datetime'])
-
-for i in range(size - 2, size + 1):
-    sigh = lt.getElement(lt_sight, i)
-    print(sigh['datetime'])
-
-
-#'''
