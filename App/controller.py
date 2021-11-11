@@ -26,7 +26,6 @@
 
 import config as cf
 import model
-import datetime as dt
 from DISClib.ADT import orderedmap as om
 from DISClib.ADT import map as mp
 from DISClib.ADT import list as lt

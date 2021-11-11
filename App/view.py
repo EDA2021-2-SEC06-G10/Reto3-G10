@@ -26,6 +26,7 @@
 
 import os
 import time
+import datetime as dt
 import config as cf
 from DISClib.ADT import map as mp
 import sys
@@ -258,6 +259,74 @@ def print_req_2 (param_low: int, param_sup: int, ans_req_2: tuple) -> None:
         print("#" * 147)
     print()
 
+
+
+# Función que imprime la respuesta del requerimiento 4.
+def print_req_4 (param_low: int, param_sup: int, ans_req_4: tuple) -> None:
+    """
+        Esta función imprime la respuesta del requerimiento 4 de una manera amigable para el usuario.
+
+        Parámetros:
+            -> param_low (int): límite inferior rango fechas.
+            -> param_sup (int): límite superior rango fechas.
+            -> ans_req_4 (tuple): tupla que contiene las respuestas del req.
+
+        No tiene retorno.
+
+    """
+    
+    # Desempaquetar respuesta.
+    size, lt_sight = ans_req_4
+    
+    # Respuesta tamaño.
+    print('La base de datos tiene un resigtro de', size, 'avistamientos que se registraron entre', param_low, 'y', str(param_sup) + '.')
+    
+    # Lista.
+    print('Una muestra de la información de algunos de estos avistamientos se dispone a contiuación:\n')
+    print("#" * 147)
+    print("# ", end = " ")
+    print(fixed_length('FECHA', 38), end = " # ")
+    print(fixed_length('CIUDAD', 40), end = " # ")
+    print(fixed_length('PAÍS', 8), end = " # ")
+    print(fixed_length('FORMA', 30), end = " # ")
+    print(fixed_length('DURACIÓN (S)', 14), end = " # ")
+    print()
+    print("#" * 147)
+
+    # Si hay menos de 6 avistamientos.
+    if (size < 6):
+        for sighting in lt.iterator(lt_sight):
+            print("# ", end = " ")
+            print(fixed_length(sighting['datetime'], 38), end = " # ")
+            print(fixed_length(sighting['city'], 40), end = " # ")
+            print(fixed_length(sighting['country'], 8), end = " # ")
+            print(fixed_length(sighting['shape'], 30), end = " # ")
+            print(fixed_length(sighting['duration (seconds)'], 14), end = " # ")
+            print()
+        print("#" * 147)
+
+    # Si hay 6 o más.
+    else:
+        for i in range(1,4):
+            sighting = lt.getElement(lt_sight, i)
+            print("# ", end = " ")
+            print(fixed_length(sighting['datetime'], 38), end = " # ")
+            print(fixed_length(sighting['city'], 40), end = " # ")
+            print(fixed_length(sighting['country'], 8), end = " # ")
+            print(fixed_length(sighting['shape'], 30), end = " # ")
+            print(fixed_length(sighting['duration (seconds)'], 14), end = " # ")
+            print()
+        for i in range(size - 2, size + 1):
+            sighting = lt.getElement(lt_sight, i)
+            print("# ", end = " ")
+            print(fixed_length(sighting['datetime'], 38), end = " # ")
+            print(fixed_length(sighting['city'], 40), end = " # ")
+            print(fixed_length(sighting['country'], 8), end = " # ")
+            print(fixed_length(sighting['shape'], 30), end = " # ")
+            print(fixed_length(sighting['duration (seconds)'], 14), end = " # ")
+            print()
+        print("#" * 147)
+    print()
 
 
 #####-----#####-----#####-----#####-----#####-----#####   ######---######---######   #####-----#####-----#####-----#####-----#####-----#####
@@ -496,6 +565,60 @@ while True:
 
                 # Imprimir respuesta.
                 print_req_2(param_low, param_sup, ans_req_2)
+
+
+            # Si el input no es válido.
+            else:
+                
+                # Imprimir mensaje de error.
+                print("""\n======================= ERROR =======================\n""")
+                print("Debe ingresar un rango válido. Intente de nuevo.\n")
+                sys.exit(0)
+        
+
+
+        # Si escoge la opción 5.
+        elif int(inputs[0]) == 5:
+
+            # Limpiar la consola.
+            os.system('cls')
+
+            # Guardar mapa 'duration (seconds)'.
+            mp_date = catalog['date']
+
+            # Imprimir mensaje de carga.
+            print("""\n======================= Inputs Req. 4 =======================\n""")
+                
+            # Preguntar al usuario por la ciudad.
+            param_low = input('Por favor, escriba la fecha inferior del rango:\n  -> ')
+            param_sup = input('Por favor, escriba la fecha superior del rango:\n  -> ')
+
+            # Convertir los inputs.
+            mod_param_low = dt.datetime.strptime(param_low, '%Y-%m-%d')
+            mod_param_sup = dt.datetime.strptime(param_sup, '%Y-%m-%d')
+
+
+            # Si el input es válido.
+            if (mod_param_low < mod_param_sup):
+
+                # Imprimir mensaje de carga.
+                print("""\n====================== Outputs Req. 4 =======================\n""")
+
+                # Iniciar el tiempo.
+                start_time = time.process_time()
+
+                # Guardar respuesta del requerimiento 3.
+                ans_req_4 = controller.req_4(catalog, param_low, param_sup)
+
+                # Parar el tiempo.
+                stop_time = time.process_time()
+
+                # Calcular tiempo de ejecución en milisegundos e imprimirlo.
+                elapsed_time_mseg = (stop_time - start_time) * 1000
+                print("Tiempo de ejecución del requerimiento:", elapsed_time_mseg, "milisegundos.\n")
+
+                # Imprimir respuesta.
+                print_req_4(param_low, param_sup, ans_req_4)
 
 
             # Si el input no es válido.
