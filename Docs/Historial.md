@@ -31,4 +31,4 @@ MIÉRCOLES 10/11:
   2- Se modificó la función load_data() para añadir parejas llave-valor al mapa 'date'.
  View:
   1- Se modificó la función print_req_1().
-  2- Se definió la función print_req_2().
+  2- Se definieron las funciones print_req_2(), print_req_4() y print_req_5().

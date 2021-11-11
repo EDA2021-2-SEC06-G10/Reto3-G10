@@ -144,7 +144,7 @@ def print_req_1 (param_city: str, ans_req_1: tuple) -> None:
     print('La base de datos tiene un resigtro de', size, 'avistamientos en la ciudad:', param_city + '.')
     
     # Lista.
-    print('Una muestra de la información de algunos de estos avistamientos se dispone a contiuación:\n')
+    print('Una muestra de la información de algunos de estos avistamientos se dispone a continuación:\n')
     print("#" * 147)
     print("# ", end = " ")
     print(fixed_length('FECHA', 38), end = " # ")
@@ -213,7 +213,7 @@ def print_req_2 (param_low: int, param_sup: int, ans_req_2: tuple) -> None:
     print('La base de datos tiene un resigtro de', size, 'avistamientos cuyas duraciones tienen un valor entre', param_low, 'y', param_sup, 'segundos.')
     
     # Lista.
-    print('Una muestra de la información de algunos de estos avistamientos se dispone a contiuación:\n')
+    print('Una muestra de la información de algunos de estos avistamientos se dispone a continuación:\n')
     print("#" * 147)
     print("# ", end = " ")
     print(fixed_length('FECHA', 38), end = " # ")
@@ -282,7 +282,7 @@ def print_req_4 (param_low: int, param_sup: int, ans_req_4: tuple) -> None:
     print('La base de datos tiene un resigtro de', size, 'avistamientos que se registraron entre', param_low, 'y', str(param_sup) + '.')
     
     # Lista.
-    print('Una muestra de la información de algunos de estos avistamientos se dispone a contiuación:\n')
+    print('Una muestra de la información de algunos de estos avistamientos se dispone a continuación:\n')
     print("#" * 147)
     print("# ", end = " ")
     print(fixed_length('FECHA', 38), end = " # ")
@@ -324,6 +324,85 @@ def print_req_4 (param_low: int, param_sup: int, ans_req_4: tuple) -> None:
             print(fixed_length(sighting['country'], 8), end = " # ")
             print(fixed_length(sighting['shape'], 30), end = " # ")
             print(fixed_length(sighting['duration (seconds)'], 14), end = " # ")
+            print()
+        print("#" * 147)
+    print()
+
+
+
+# Función que imprime la respuesta del requerimiento 5.
+def print_req_5 (mod_long_low: float, mod_long_sup: float , mod_lat_low: float , mod_lat_sup: float , ans_req_5: tuple) -> None:
+    """
+        Esta función imprime la respuesta del requerimiento 5 de una manera amigable para el usuario.
+
+        Parámetros:
+            -> mod_long_low (float): límite inferior longitud.
+            -> mod_long_sup (float): límite inferior longitud.
+            -> mod_lat_low (float): límite inferior latitud.
+            -> mod_lat_sup (float): límite inferior latitud.
+            -> ans_req_5 (tuple): tupla que contiene las respuestas del req.
+
+        No tiene retorno.
+
+    """
+    
+    # Desempaquetar respuesta.
+    size, lt_sight = ans_req_5
+    
+    # Respuesta tamaño.
+    print('La base de datos tiene un resigtro de', size, 'avistamientos que se registraron entre la latitud del rango', mod_lat_low, 'a', mod_lat_sup, 'y longitud del rango', mod_long_low, 'a', str(mod_long_sup) + '.')
+    
+    # Lista.
+    print('Una muestra de la información de algunos de estos avistamientos se dispone a continuación:\n')
+    print("#" * 147)
+    print("# ", end = " ")
+    print(fixed_length('FECHA', 25), end = " # ")
+    print(fixed_length('CIUDAD', 25), end = " # ")
+    print(fixed_length('PAÍS', 8), end = " # ")
+    print(fixed_length('FORMA', 22), end = " # ")
+    print(fixed_length('DURACIÓN (S)', 14), end = " # ")
+    print(fixed_length('LATITUD', 15), end = " # ")
+    print(fixed_length('LONGITUD', 15), end = " # ")
+    print()
+    print("#" * 147)
+
+    # Si hay menos de 6 avistamientos.
+    if (size < 6):
+        for sighting in lt.iterator(lt_sight):
+            print("# ", end = " ")
+            print(fixed_length(sighting['datetime'], 25), end = " # ")
+            print(fixed_length(sighting['city'], 25), end = " # ")
+            print(fixed_length(sighting['country'], 8), end = " # ")
+            print(fixed_length(sighting['shape'], 22), end = " # ")
+            print(fixed_length(sighting['duration (seconds)'], 14), end = " # ")
+            print(fixed_length(sighting['latitude'], 15), end = " # ")
+            print(fixed_length(sighting['longitude'], 15), end = " # ")
+            print()
+        print("#" * 147)
+
+    # Si hay 6 o más.
+    else:
+        for i in range(1,4):
+            sighting = lt.getElement(lt_sight, i)
+            print("# ", end = " ")
+            print(fixed_length(sighting['datetime'], 25), end = " # ")
+            print(fixed_length(sighting['city'], 25), end = " # ")
+            print(fixed_length(sighting['country'], 8), end = " # ")
+            print(fixed_length(sighting['shape'], 22), end = " # ")
+            print(fixed_length(sighting['duration (seconds)'], 14), end = " # ")
+            print(fixed_length(sighting['latitude'], 15), end = " # ")
+            print(fixed_length(sighting['longitude'], 15), end = " # ")
+            print()
+        for i in range(size - 2, size + 1):
+            sighting = lt.getElement(lt_sight, i)
+            print("# ", end = " ")
+            print(fixed_length(sighting['datetime'], 25), end = " # ")
+            print(fixed_length(sighting['city'], 25), end = " # ")
+            print(fixed_length(sighting['country'], 8), end = " # ")
+            print(fixed_length(sighting['shape'], 22), end = " # ")
+            print(fixed_length(sighting['duration (seconds)'], 14), end = " # ")
+            print(fixed_length(sighting['latitude'], 15), end = " # ")
+            print(fixed_length(sighting['longitude'], 15), end = " # ")
             print()
         print("#" * 147)
     print()
@@ -529,13 +608,10 @@ while True:
             # Limpiar la consola.
             os.system('cls')
 
-            # Guardar mapa 'duration (seconds)'.
-            mp_duration = catalog['duration (seconds)']
-
             # Imprimir mensaje de carga.
             print("""\n======================= Inputs Req. 2 =======================\n""")
                 
-            # Preguntar al usuario por la ciudad.
+            # Preguntar al usuario por inputs.
             param_low = input('Por favor, escriba el límite inferior del rango:\n  -> ')
             param_sup = input('Por favor, escriba el límite superior del rango:\n  -> ')
 
@@ -583,13 +659,10 @@ while True:
             # Limpiar la consola.
             os.system('cls')
 
-            # Guardar mapa 'duration (seconds)'.
-            mp_date = catalog['date']
-
             # Imprimir mensaje de carga.
             print("""\n======================= Inputs Req. 4 =======================\n""")
                 
-            # Preguntar al usuario por la ciudad.
+            # Preguntar al usuario por por inputs.
             param_low = input('Por favor, escriba la fecha inferior del rango:\n  -> ')
             param_sup = input('Por favor, escriba la fecha superior del rango:\n  -> ')
 
@@ -627,6 +700,61 @@ while True:
                 # Imprimir mensaje de error.
                 print("""\n======================= ERROR =======================\n""")
                 print("Debe ingresar un rango válido. Intente de nuevo.\n")
+                sys.exit(0)
+
+        
+
+        # Si escoge la opción 6.
+        elif int(inputs[0]) == 6:
+
+            # Limpiar la consola.
+            os.system('cls')
+
+            # Imprimir mensaje de carga.
+            print("""\n======================= Inputs Req. 5 =======================\n""")
+                
+            # Preguntar al usuario por inputs.
+            lat_low = input('Por favor, escriba la latitud inferior del rango:\n  -> ')
+            lat_sup = input('Por favor, escriba la latitud superior del rango:\n  -> ')
+            long_low = input('Por favor, escriba la longitud inferior del rango:\n  -> ')
+            long_sup = input('Por favor, escriba la longitud superior del rango:\n  -> ')
+
+            # Convertir los inputs.
+            mod_lat_low = float(lat_low)
+            mod_lat_sup = float(lat_sup)
+            mod_long_low = float(long_low)
+            mod_long_sup = float(long_sup)
+
+
+            # Si el input es válido.
+            if (mod_lat_low < mod_lat_sup) and (mod_long_low < mod_long_sup):
+
+                # Imprimir mensaje de carga.
+                print("""\n====================== Outputs Req. 5 =======================\n""")
+
+                # Iniciar el tiempo.
+                start_time = time.process_time()
+
+                # Guardar respuesta del requerimiento 3.
+                ans_req_5 = controller.req_5(catalog, mod_long_low, mod_long_sup, mod_lat_low, mod_lat_sup)
+
+                # Parar el tiempo.
+                stop_time = time.process_time()
+
+                # Calcular tiempo de ejecución en milisegundos e imprimirlo.
+                elapsed_time_mseg = (stop_time - start_time) * 1000
+                print("Tiempo de ejecución del requerimiento:", elapsed_time_mseg, "milisegundos.\n")
+
+                # Imprimir respuesta.
+                print_req_5(mod_long_low, mod_long_sup, mod_lat_low, mod_lat_sup, ans_req_5)
+
+
+            # Si el input no es válido.
+            else:
+                
+                # Imprimir mensaje de error.
+                print("""\n======================= ERROR =======================\n""")
+                print("Debe ingresar coordenadas válidas. Intente de nuevo.\n")
                 sys.exit(0)
 
 
